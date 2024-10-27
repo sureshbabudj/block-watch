@@ -11,7 +11,8 @@
     "sync": "npx cap sync",
     "android": "npx cap run android",
     "ios": "npx cap run ios",
-    "lint": "next lint"
+    "lint": "next lint",
+    "assets-gen": "npx @capacitor/assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#111111'"
   },
   "dependencies": {
     "@capacitor/action-sheet": "^6.0.0",
@@ -31,6 +32,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
