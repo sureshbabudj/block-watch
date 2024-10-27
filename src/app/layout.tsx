@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import NonSSR from "@/components/NonSSR";
 import localFont from "next/font/local";
 import "./globals.css";
+import { NavBar } from "@/components/NavBar";
+import { Header } from "@/components/Header";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,10 +28,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="viewport"
+          content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased md:max-h-[100dvh] md:max-w-[100dvw] p-[env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)]`}
       >
-        {children}
+        <div className="flex flex-col py-16 overflow-hidden max-h-[100dvh]">
+          <Header />
+          <div className="flex-1  overflow-y-auto overflow-x-hidden p-2">
+            <main className="mx-auto w-full">{children}</main>
+            <NonSSR showInfo={false} />
+          </div>
+          <NavBar />
+        </div>
       </body>
     </html>
   );

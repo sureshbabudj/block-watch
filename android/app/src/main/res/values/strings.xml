@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">block-watch</string>
+    <string name="title_activity_main">block-watch</string>
+    <string name="package_name">com.sureshbabudj.blockwatch</string>
+    <string name="custom_url_scheme">com.sureshbabudj.blockwatch</string>
+</resources>
