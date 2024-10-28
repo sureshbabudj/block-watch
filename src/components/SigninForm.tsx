@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
-import useAuth from "@/hooks/useAuth";
-import { Loader2Icon, LucideLoader } from "lucide-react";
+import { userAtom } from "@/lib/appStore";
+import { useAtom } from "jotai";
 
 const SigninForm = () => {
+  const [user] = useAtom(userAtom);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const { user, loading, error: authErr } = useAuth();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -32,15 +32,6 @@ const SigninForm = () => {
       setError(data.error);
     }
   };
-
-  if (loading) {
-    return (
-      <p className="text-center flex flex-col items-center h-full justify-center">
-        loading...
-        <LucideLoader />
-      </p>
-    );
-  }
 
   if (user && user.id) {
     return <p>Welcome {user.firstName}</p>;

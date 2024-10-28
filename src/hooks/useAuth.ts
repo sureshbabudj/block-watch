@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { CapacitorCookies } from "@capacitor/core";
-import { User } from "@prisma/client";
+
+import { LoggedInUser, userAtom } from "@/lib/appStore";
+import { useAtom } from "jotai";
 
 const AUTH_COOKIE_NAME = "auth_session";
 
-type LoggedInUser = Omit<User, "password">;
-
 const useAuth = () => {
-  const [user, setUser] = useState<LoggedInUser | null>(null);
+  const [user, setUser] = useAtom(userAtom);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 

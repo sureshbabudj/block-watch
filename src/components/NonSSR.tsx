@@ -4,15 +4,18 @@
 import { useEffect, useState } from "react";
 import { defineCustomElements } from "@ionic/pwa-elements/loader";
 import { Device, DeviceInfo } from "@capacitor/device";
+import useAuth from "@/hooks/useAuth";
 
 const LoadNonSSR = ({ showInfo = false }: { showInfo?: boolean }) => {
-  let statusBarHeight = 0;
+  useAuth();
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
 
   const load = async () => {
     if (window) {
-      const info = await Device.getInfo();
-      setDeviceInfo(info);
+      if (showInfo) {
+        const info = await Device.getInfo();
+        setDeviceInfo(info);
+      }
       defineCustomElements(window);
     }
   };

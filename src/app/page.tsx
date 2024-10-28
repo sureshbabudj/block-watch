@@ -1,3 +1,4 @@
+import { Profile } from "@/components/Profile";
 import { ActionSheetComponent } from "../components/ActionSheet";
 
 export default function Home() {
@@ -5,6 +6,7 @@ export default function Home() {
     <>
       Welcome to Block Watch!
       <br />
+      <Profile />
       <ActionSheetComponent />
     </>
   );
