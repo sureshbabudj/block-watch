@@ -2,9 +2,13 @@
 import { useState } from "react";
 import { userAtom } from "@/lib/appStore";
 import { useAtom } from "jotai";
+import Link from "next/link";
+import { SignoutAction } from "./SignoutAction";
+import useAuth from "@/hooks/useAuth";
 
 const SigninForm = () => {
   const [user] = useAtom(userAtom);
+  const { refreshAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -28,13 +32,18 @@ const SigninForm = () => {
 
     if (response.ok) {
       setSuccess(data.message);
+      refreshAuth();
     } else {
       setError(data.error);
     }
   };
 
   if (user && user.id) {
-    return <p>Welcome {user.firstName}</p>;
+    return (
+      <p>
+        Welcome {user.firstName} <SignoutAction />
+      </p>
+    );
   }
 
   return (
@@ -82,6 +91,10 @@ const SigninForm = () => {
           Login
         </button>
       </form>
+
+      <p>
+        Or <Link href="/signup">sign up here</Link>
+      </p>
     </div>
   );
 };

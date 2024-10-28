@@ -27,7 +27,8 @@ const sendSuccessResponse = (data: Partial<User> | { success: true }) => {
 // User creation handler
 export const createUser = async (req: Request) => {
   try {
-    const { email, password, firstName, lastName, address } = await req.json();
+    const { email, password, firstName, lastName, address, neighborhoodId } =
+      await req.json();
 
     // 1. Verify the payload
     if (!email || !password || !firstName || !lastName || !address) {
@@ -56,8 +57,25 @@ export const createUser = async (req: Request) => {
       },
     });
 
-    // Send success response with non-sensitive information
-    return sendSuccessResponse({ id: user.id, email: user.email });
+    if (neighborhoodId) {
+      await prisma.neighborhood.update({
+        where: { id: neighborhoodId },
+        data: {
+          users: {
+            connect: { id: user.id },
+          },
+        },
+      });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const signin = searchParams.get("signin");
+    // login or Send success response with non-sensitive information
+    if (signin) {
+      return loginUserInternal(email, password);
+    } else {
+      return sendSuccessResponse({ id: user.id, email: user.email });
+    }
   } catch (error: any) {
     return sendErrorResponse(error?.message, 500);
   }
@@ -67,49 +85,60 @@ export const createUser = async (req: Request) => {
 export const loginUser = async (req: Request) => {
   try {
     const { email, password } = await req.json();
-
-    // 3.a Verify the payload
-    if (!email || !password) {
-      return sendErrorResponse("Email and password are required.");
-    }
-
-    // 3.b Check if email exists in the database
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return sendErrorResponse("Email not found.");
-    }
-
-    // 3.c Compare input password with hashed password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return sendErrorResponse("Invalid password.");
-    }
-
-    // 3.d Create a session with Lucia
-    const session = await lucia.createSession(user.id, {
-      userId: user.id,
-    });
-
-    // 3.e Set cookies
-    const { name, value } = lucia.createSessionCookie(session.id);
-    const response = NextResponse.json({ message: "Login successful" });
-    response.cookies.set(name, value);
-    return response;
+    return loginUserInternal(email, password);
   } catch (error: any) {
     return sendErrorResponse(error?.message, 500);
   }
 };
 
+const loginUserInternal = async (email: string, password: string) => {
+  // 3.a Verify the payload
+  if (!email || !password) {
+    return sendErrorResponse("Email and password are required.");
+  }
+
+  // 3.b Check if email exists in the database
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return sendErrorResponse("Email not found.");
+  }
+
+  // 3.c Compare input password with hashed password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    return sendErrorResponse("Invalid password.");
+  }
+
+  // 3.d Create a session with Lucia
+  const session = await lucia.createSession(user.id, {
+    userId: user.id,
+  });
+
+  // 3.e Set cookies
+  const { name, value } = lucia.createSessionCookie(session.id);
+  const response = NextResponse.json({ message: "Login successful" });
+  response.cookies.set(name, value, {
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 2 * 7 * 24 * 60 * 60, // 2 weeks in seconds
+  });
+  return response;
+};
+
 // User logout handler
 export const logoutUser = async (req: Request) => {
-  const sessionId = req.headers.get(lucia.sessionCookieName) ?? null;
+  let message = "Logout successful";
+  const sessionId =
+    (req as any).cookies.get(lucia.sessionCookieName).value ?? null;
   const { user } = await getSession(sessionId);
+  const response = NextResponse.json({ message });
+  response.cookies.set(lucia.sessionCookieName, "", { maxAge: -1 });
   if (!user || !user.id) {
-    return sendErrorResponse("user not logged in!");
+    message = "user already logged out!";
   } else {
-    lucia.invalidateUserSessions(user.id);
-    return NextResponse.json({ message: "Logout successful" });
+    lucia.invalidateSession(user.id);
   }
+  return response;
 };
 
 export const getSession = async (

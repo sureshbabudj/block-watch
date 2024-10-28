@@ -1,31 +1,23 @@
 import { useState, useEffect } from "react";
-import { CapacitorCookies } from "@capacitor/core";
-
-import { LoggedInUser, userAtom } from "@/lib/appStore";
 import { useAtom } from "jotai";
-
-const AUTH_COOKIE_NAME = "auth_session";
+import { LoggedInUser, userAtom } from "@/lib/appStore";
 
 const useAuth = () => {
   const [user, setUser] = useAtom(userAtom);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const cookies = await CapacitorCookies.getCookies();
-        const authCookie = cookies[AUTH_COOKIE_NAME];
-        if (!authCookie) {
-          throw new Error("Auth cookie not found");
-        }
+      setLoading(true);
+      setError(null); // Reset error state before fetching
 
-        // Create a request with the auth cookie
+      try {
         const response = await fetch("/api/auth/profile", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Cookie: `${AUTH_COOKIE_NAME}=${authCookie}`,
           },
           credentials: "include", // Ensure cookies are included in the request
         });
@@ -43,10 +35,12 @@ const useAuth = () => {
       }
     };
 
-    fetchUser();
-  }, []);
+    if (!user) fetchUser();
+  }, [refresh, setUser]);
 
-  return { user, loading, error };
+  const refreshAuth = () => setRefresh((prev) => !prev);
+
+  return { user, loading, error, refreshAuth };
 };
 
 export default useAuth;
