@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: "block-watch",
   webDir: "out",
   server: {
-    url: "https://28f9-87-178-161-167.ngrok-free.app/",
+    url: "https://0d7b-62-209-48-172.ngrok-free.app",
   },
 
   ios: { contentInset: "always", scrollEnabled: true },

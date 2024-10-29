@@ -13,10 +13,11 @@ import { Button } from "@/components/ui/button";
 import UserDetailsForm from "./UserDetailsForm";
 import NeighborhoodSelection from "./NeighborhoodSelection";
 import OptionalInfoForm from "./OptionalInfoForm";
+import { LoggedInUser } from "@/lib/appStore";
 
 export default function SignupWizard() {
   const [step, setStep] = useState(1);
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState<LoggedInUser | null>(null);
 
   const handleNext = (data: any) => {
     setUserData({ ...userData, ...data });
@@ -36,7 +37,7 @@ export default function SignupWizard() {
         </CardHeader>
         <CardContent>
           {step === 1 && <UserDetailsForm onNext={handleNext} />}
-          {step === 2 && (
+          {step === 2 && userData && (
             <NeighborhoodSelection
               onNext={handleNext}
               onPrevious={handlePrevious}

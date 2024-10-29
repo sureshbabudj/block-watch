@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { MapContainer, TileLayer, Polygon, useMapEvents } from "react-leaflet";
+import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Coordinates, OpenMapData } from "@/types";
 import { Neighborhood } from "@prisma/client";
-import { useAtom } from "jotai";
-import { userAtom } from "@/lib/appStore";
+import { LoggedInUser } from "@/lib/appStore";
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -30,23 +29,26 @@ const formSchema = z.object({
 interface NeighborhoodSelectionProps {
   onNext: (userData: any) => void;
   onPrevious: (userData: any) => void;
-  userData: any;
+  userData: LoggedInUser;
 }
 
 type BoundaryInput = [number, number];
+
+const MapComponent = dynamic(() => import("@/components/Map"), {
+  ssr: false,
+  loading: () => <p>Loading Map...</p>,
+});
 
 export default function NeighborhoodSelection({
   onNext,
   onPrevious,
   userData,
 }: NeighborhoodSelectionProps) {
-  const [user] = useAtom(userAtom);
-  const [boundaries, setBoundaries] = useState(null);
   const [error, setError] = useState("");
   const [initialCoordinates, setInitialCoordinates] =
     useState<Coordinates | null>(null);
   const [boundingBoxPolygon, setBoundingBoxPolygon] = useState<BoundaryInput[]>(
-    [],
+    []
   );
   const [userBoundingBoxPolygon, setUserBoundingBoxPolygon] = useState<
     BoundaryInput[]
@@ -61,25 +63,8 @@ export default function NeighborhoodSelection({
       name: "",
       description: "",
       rules: "",
-      boundaries: "",
     },
   });
-
-  useEffect(() => {
-    user && getNeighborhood(user.address);
-  }, [user]);
-
-  useEffect(() => {
-    // Cleanup function to remove the map instance on component unmount
-    return () => {
-      const mapContainer = document.getElementById("map") as HTMLElement & {
-        _leaflet_id: any;
-      };
-      if (mapContainer && mapContainer._leaflet_id) {
-        mapContainer._leaflet_id = null;
-      }
-    };
-  }, []);
 
   const getBoundingbox = (boundingBox: OpenMapData["boundingbox"]) => {
     const southWest: BoundaryInput = [
@@ -110,7 +95,7 @@ export default function NeighborhoodSelection({
   const getNeighborhood = async (address: string) => {
     try {
       const response = await fetch(
-        `/api/neighborhoods/polygon?address=${address}`,
+        `/api/neighborhoods/polygon?address=${address}`
       );
       const data = await response.json();
       if (!data.neighborhood) {
@@ -126,17 +111,24 @@ export default function NeighborhoodSelection({
         return null;
       }
       setSelectedNeighborhood(data.neighborhood);
-      setLoading(false);
     } catch (error: any) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const formatBoundaries = (boundaries: BoundaryInput[]): string => {
+    return boundaries.map(([lat, lng]) => `${lat}:${lng}`).join(",");
+  };
+
   const onSubmit = async (data: any) => {
-    if (!boundaries) {
+    if (userBoundingBoxPolygon.length === 0) {
       setError("Please draw your neighborhood boundaries on the map");
       return;
     }
+
+    const formattedBoundaries = formatBoundaries(userBoundingBoxPolygon);
 
     try {
       const response = await fetch("/api/neighborhoods", {
@@ -144,7 +136,7 @@ export default function NeighborhoodSelection({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          boundaries: JSON.stringify(boundaries),
+          boundaries: formattedBoundaries,
           userId: userData.id,
         }),
       });
@@ -156,7 +148,7 @@ export default function NeighborhoodSelection({
         const errorData = await response.json();
         setError(
           errorData.message ||
-            "An error occurred while creating the neighborhood",
+            "An error occurred while creating the neighborhood"
         );
       }
     } catch (err) {
@@ -164,52 +156,32 @@ export default function NeighborhoodSelection({
     }
   };
 
-  const MapEvents = () => {
-    useMapEvents({
-      click: handleMapClick,
-    });
-    return null;
-  };
-
-  const handleMapClick = (e: any) => {
-    const { boundaries } = form.getValues();
-
-    form.setValue(
-      "boundaries",
-      `${form.getValues("boundaries")}:${e.latlng.lat},${e.latlng.lng}}`,
-    );
-  };
+  useEffect(() => {
+    getNeighborhood(userData.address);
+  }, [userData.address]);
 
   if (loading) {
-    return "loading";
+    return <div>Loading...</div>;
   }
 
   if (!initialCoordinates) {
-    return "No initial coordinates";
+    return <div>No initial coordinates</div>;
+  }
+
+  if (selectedNeighborhood) {
+    return <p>Good news, we found your community based on your address.</p>;
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="h-64 mb-4">
-          <MapContainer
-            id="map"
-            center={[initialCoordinates.lat, initialCoordinates.lon]}
-            zoom={13}
-            style={{ height: "400px", width: "100%" }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {/* {form.getValues("boundaries").length > 0 && (
-              <Polygon positions={form.getValues("boundaries") as} />
-            )} */}
-            {boundingBoxPolygon.length > 0 && (
-              <Polygon positions={boundingBoxPolygon} />
-            )}
-            <MapEvents />
-          </MapContainer>
+        <div className="h-96 mb-4">
+          <MapComponent
+            initialCoordinates={initialCoordinates}
+            boundingBoxPolygon={boundingBoxPolygon}
+            userBoundingBoxPolygon={userBoundingBoxPolygon}
+            setUserBoundingBoxPolygon={setUserBoundingBoxPolygon}
+          />
         </div>
         <FormField
           control={form.control}

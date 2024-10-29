@@ -6,39 +6,52 @@ const useAuth = () => {
   const [user, setUser] = useAtom(userAtom);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [refresh, setRefresh] = useState(false);
+
+  const fetchUser = async () => {
+    const result: {user: LoggedInUser | null; error: any | null} = { user: null, error: null};
+    setLoading(true);
+    setError(null); // Reset error state before fetching
+
+    try {
+      const response = await fetch("/api/auth/profile", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Ensure cookies are included in the request
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const data = await response.json();
+      result.user = data.user as LoggedInUser;
+      setUser(result.user);
+    } catch (err: any) {
+      result.error = err;
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+    return result;
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      setError(null); // Reset error state before fetching
+    if (!user) { 
+      fetchUser();
+    }
+  }, []);
 
-      try {
-        const response = await fetch("/api/auth/profile", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // Ensure cookies are included in the request
-        });
+  const refreshAuth = () => new Promise<{user: LoggedInUser | null; error: any | null}>(async (resolve, reject) => {
+    const {user, error}  = await fetchUser();
+    if (error) {
+      reject({user: null, error})
+    } else {
+      resolve({user, error: null})
+    }
+  });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user");
-        }
-
-        const data = await response.json();
-        setUser(data.user as LoggedInUser);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!user) fetchUser();
-  }, [refresh, setUser]);
-
-  const refreshAuth = () => setRefresh((prev) => !prev);
 
   return { user, loading, error, refreshAuth };
 };

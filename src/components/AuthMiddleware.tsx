@@ -9,7 +9,7 @@ const protectedPaths = ["profile", "main"];
 const authPaths = ["signin", "signup"];
 
 export function AuthMiddleware() {
-  const { user, loading, error, refreshAuth } = useAuth();
+  const { user, loading } = useAuth();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -34,5 +34,5 @@ export function AuthMiddleware() {
     }
   }, [pathname, loading]);
 
-  return <div data-pathname={pathname} hidden></div>;
+  return <div data-pathname={pathname} className= "fixed h-[100dvh] w-[100dvw] z-20 bg-[#00000077] top-0 left-0" hidden={!loading}></div>;
 }

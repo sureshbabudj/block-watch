@@ -54,16 +54,15 @@ export default function UserDetailsForm({
 
       if (response.ok) {
         const userData = await response.json();
-        refreshAuth();
-        if (!authLoading) {
-          onNext(userData);
-        }
+        const { user, error } = await refreshAuth();
+        if (error) throw error;
+        onNext(user);
       } else {
         const errorData = await response.json();
         setError(errorData.message || "An error occurred during signup");
       }
-    } catch (err) {
-      setError("An error occurred during signup");
+    } catch (err: any) {
+      setError(err?.message ?? "An error occurred during signup");
     } finally {
       setLoading(false);
     }

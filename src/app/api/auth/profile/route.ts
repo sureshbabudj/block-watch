@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   try {
     const sessionId =
-      (req as any).cookies.get(lucia.sessionCookieName).value ?? null;
+      (req as any).cookies.get(lucia.sessionCookieName)?.value ?? null;
     const { user } = await getSession(sessionId);
 
     if (!user || !user.id) {

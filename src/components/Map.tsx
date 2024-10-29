@@ -1,28 +1,73 @@
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Polygon, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import { Button } from "./ui/button";
 
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import { Suspense } from "react";
+type BoundaryInput = [number, number];
 
-export function SimpleExample(props: any) {
+interface MapComponentProps {
+  initialCoordinates: { lat: number; lon: number };
+  boundingBoxPolygon: BoundaryInput[];
+  userBoundingBoxPolygon: BoundaryInput[];
+  setUserBoundingBoxPolygon: React.Dispatch<
+    React.SetStateAction<BoundaryInput[]>
+  >;
+}
+
+function MapEvents({
+  setUserBoundingBoxPolygon,
+}: {
+  setUserBoundingBoxPolygon: MapComponentProps["setUserBoundingBoxPolygon"];
+}) {
+  useMapEvents({
+    click: (e) => {
+      const newPoint: BoundaryInput = [e.latlng.lat, e.latlng.lng];
+      setUserBoundingBoxPolygon((prev) => [...prev, newPoint]);
+    },
+  });
+  return null;
+}
+
+export default function MapComponent({
+  initialCoordinates,
+  boundingBoxPolygon,
+  userBoundingBoxPolygon,
+  setUserBoundingBoxPolygon,
+}: MapComponentProps) {
+  useEffect(() => {
+    // Cleanup function to remove the map instance on component unmount
+    return () => {
+      const mapContainer = document.getElementById("map") as HTMLElement & {
+        _leaflet_id: any;
+      };
+      if (mapContainer && mapContainer._leaflet_id) {
+        mapContainer._leaflet_id = null;
+      }
+    };
+  }, []);
+
   return (
-    <MapContainer
-      center={props.position}
-      zoom={13}
-      key={new Date().toISOString()}
-    >
-      <Suspense>
+    <>
+      {" "}
+      <MapContainer
+        id="map"
+        center={[initialCoordinates.lat, initialCoordinates.lon]}
+        zoom={13}
+        style={{ height: "100%", width: "100%" }}
+      >
         <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker position={props.position}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
-      </Suspense>
-    </MapContainer>
+        {!userBoundingBoxPolygon.length && boundingBoxPolygon.length > 0 && (
+          <Polygon positions={boundingBoxPolygon} color="blue" />
+        )}
+        {userBoundingBoxPolygon.length > 0 && (
+          <Polygon positions={userBoundingBoxPolygon} color="red" />
+        )}
+        <MapEvents setUserBoundingBoxPolygon={setUserBoundingBoxPolygon} />
+      </MapContainer>
+      <Button onClick={() => setUserBoundingBoxPolygon([])}>Reset</Button>
+    </>
   );
 }
