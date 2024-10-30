@@ -14,14 +14,17 @@ import UserDetailsForm from "./UserDetailsForm";
 import NeighborhoodSelection from "./NeighborhoodSelection";
 import OptionalInfoForm from "./OptionalInfoForm";
 import { LoggedInUser } from "@/lib/appStore";
+import { useRouter } from "next/navigation";
 
 export default function SignupWizard() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [userData, setUserData] = useState<LoggedInUser | null>(null);
 
   const handleNext = (data: any) => {
     setUserData({ ...userData, ...data });
-    setStep(step + 1);
+    if (step < 3) setStep(step + 1);
+    else router.replace("./");
   };
 
   const handlePrevious = () => {
@@ -58,7 +61,7 @@ export default function SignupWizard() {
               Previous
             </Button>
           )}
-          {step < 3 && (
+          {step <= 3 && (
             <Button
               onClick={() => document.querySelector("form")?.requestSubmit()}
             >

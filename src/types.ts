@@ -1,3 +1,5 @@
+import { Neighborhood, Post, User, Event, Alert } from "@prisma/client";
+
 export interface Coordinates {
   lat: number;
   lon: number;
@@ -31,4 +33,11 @@ export interface OpenMapAddress {
   country_code: string;
   hamlet?: string;
   village?: string;
+}
+
+export interface ExtendedNeighborhood extends Neighborhood {
+  users: User[];
+  posts: Post[];
+  events: Event[];
+  Alert: Alert[];
 }

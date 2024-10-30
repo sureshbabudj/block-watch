@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ngrok http http://localhost:3000 && next dev",
+    "ngrok": "ngrok http http://localhost:3000",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "serve": "npx serve out",

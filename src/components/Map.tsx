@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Polygon, useMapEvents } from "react-leaflet";
-import L from "leaflet";
 import { Button } from "./ui/button";
 
 type BoundaryInput = [number, number];
@@ -9,7 +8,7 @@ interface MapComponentProps {
   initialCoordinates: { lat: number; lon: number };
   boundingBoxPolygon: BoundaryInput[];
   userBoundingBoxPolygon: BoundaryInput[];
-  setUserBoundingBoxPolygon: React.Dispatch<
+  setUserBoundingBoxPolygon?: React.Dispatch<
     React.SetStateAction<BoundaryInput[]>
   >;
 }
@@ -22,7 +21,7 @@ function MapEvents({
   useMapEvents({
     click: (e) => {
       const newPoint: BoundaryInput = [e.latlng.lat, e.latlng.lng];
-      setUserBoundingBoxPolygon((prev) => [...prev, newPoint]);
+      setUserBoundingBoxPolygon?.((prev) => [...prev, newPoint]);
     },
   });
   return null;
@@ -65,9 +64,13 @@ export default function MapComponent({
         {userBoundingBoxPolygon.length > 0 && (
           <Polygon positions={userBoundingBoxPolygon} color="red" />
         )}
-        <MapEvents setUserBoundingBoxPolygon={setUserBoundingBoxPolygon} />
+        {setUserBoundingBoxPolygon && (
+          <>
+            <MapEvents setUserBoundingBoxPolygon={setUserBoundingBoxPolygon} />
+            <Button onClick={() => setUserBoundingBoxPolygon([])}>Reset</Button>
+          </>
+        )}
       </MapContainer>
-      <Button onClick={() => setUserBoundingBoxPolygon([])}>Reset</Button>
     </>
   );
 }

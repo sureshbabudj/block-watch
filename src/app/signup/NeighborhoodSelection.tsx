@@ -16,9 +16,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Coordinates, OpenMapData } from "@/types";
-import { Neighborhood } from "@prisma/client";
+import { Coordinates, ExtendedNeighborhood, OpenMapData } from "@/types";
 import { LoggedInUser } from "@/lib/appStore";
+import NeighborhoodView from "./NeighborhoodView";
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -39,6 +39,33 @@ const MapComponent = dynamic(() => import("@/components/Map"), {
   loading: () => <p>Loading Map...</p>,
 });
 
+const parseBoundaries = (boundariesString: string): string[][] => {
+  return boundariesString.split(",").map((pair) => {
+    const [lat, lng] = pair.split(":");
+    return [lat, lng];
+  });
+};
+
+const getBoundingbox = (boundingBox: OpenMapData["boundingbox"]) => {
+  const southWest: BoundaryInput = [
+    parseFloat(boundingBox[0]),
+    parseFloat(boundingBox[2]),
+  ];
+  const northWest: BoundaryInput = [
+    parseFloat(boundingBox[1]),
+    parseFloat(boundingBox[2]),
+  ];
+  const northEast: BoundaryInput = [
+    parseFloat(boundingBox[1]),
+    parseFloat(boundingBox[3]),
+  ];
+  const southEast: BoundaryInput = [
+    parseFloat(boundingBox[0]),
+    parseFloat(boundingBox[3]),
+  ];
+  return [southWest, northWest, northEast, southEast, southWest];
+};
+
 export default function NeighborhoodSelection({
   onNext,
   onPrevious,
@@ -54,7 +81,7 @@ export default function NeighborhoodSelection({
     BoundaryInput[]
   >([]);
   const [selectedNeighborhood, setSelectedNeighborhood] =
-    useState<Neighborhood | null>(null);
+    useState<ExtendedNeighborhood | null>(null);
   const [loading, setLoading] = useState(true);
 
   const form = useForm({
@@ -66,36 +93,10 @@ export default function NeighborhoodSelection({
     },
   });
 
-  const getBoundingbox = (boundingBox: OpenMapData["boundingbox"]) => {
-    const southWest: BoundaryInput = [
-      parseFloat(boundingBox[0]),
-      parseFloat(boundingBox[2]),
-    ];
-    const northWest: BoundaryInput = [
-      parseFloat(boundingBox[1]),
-      parseFloat(boundingBox[2]),
-    ];
-    const northEast: BoundaryInput = [
-      parseFloat(boundingBox[1]),
-      parseFloat(boundingBox[3]),
-    ];
-    const southEast: BoundaryInput = [
-      parseFloat(boundingBox[0]),
-      parseFloat(boundingBox[3]),
-    ];
-    setBoundingBoxPolygon([
-      southWest,
-      northWest,
-      northEast,
-      southEast,
-      southWest,
-    ]);
-  };
-
   const getNeighborhood = async (address: string) => {
     try {
       const response = await fetch(
-        `/api/neighborhoods/polygon?address=${address}`
+        `/api/neighborhoods/search?address=${address}`
       );
       const data = await response.json();
       if (!data.neighborhood) {
@@ -106,7 +107,8 @@ export default function NeighborhoodSelection({
             lon: parseFloat(lon),
           };
           setInitialCoordinates(coordinates);
-          getBoundingbox(boundingbox);
+          const boundingBoxPolygon = getBoundingbox(boundingbox);
+          setBoundingBoxPolygon(boundingBoxPolygon);
         }
         return null;
       }
@@ -123,12 +125,16 @@ export default function NeighborhoodSelection({
   };
 
   const onSubmit = async (data: any) => {
-    if (userBoundingBoxPolygon.length === 0) {
+    const inputBoundaries =
+      userBoundingBoxPolygon.length > 0
+        ? userBoundingBoxPolygon
+        : boundingBoxPolygon;
+    if (inputBoundaries.length === 0) {
       setError("Please draw your neighborhood boundaries on the map");
       return;
     }
 
-    const formattedBoundaries = formatBoundaries(userBoundingBoxPolygon);
+    const formattedBoundaries = formatBoundaries(inputBoundaries);
 
     try {
       const response = await fetch("/api/neighborhoods", {
@@ -164,65 +170,87 @@ export default function NeighborhoodSelection({
     return <div>Loading...</div>;
   }
 
-  if (!initialCoordinates) {
-    return <div>No initial coordinates</div>;
-  }
+  const handleOnNext = () => {
+    onNext({ ...userData, neighborhood: selectedNeighborhood });
+  };
 
   if (selectedNeighborhood) {
-    return <p>Good news, we found your community based on your address.</p>;
+    form.setValue("name", selectedNeighborhood.name);
+    form.setValue("description", selectedNeighborhood.description);
+    form.setValue("rules", selectedNeighborhood.rules);
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleOnNext)} className="space-y-4">
+          <NeighborhoodView neighborhood={selectedNeighborhood} />
+        </form>
+      </Form>
+    );
   }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="h-96 mb-4">
-          <MapComponent
-            initialCoordinates={initialCoordinates}
-            boundingBoxPolygon={boundingBoxPolygon}
-            userBoundingBoxPolygon={userBoundingBoxPolygon}
-            setUserBoundingBoxPolygon={setUserBoundingBoxPolygon}
-          />
-        </div>
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Neighborhood Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter neighborhood name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+        <>
+          {!initialCoordinates ? (
+            <div>No initial coordinates</div>
+          ) : (
+            <>
+              <div className="h-96 mb-4">
+                <MapComponent
+                  initialCoordinates={initialCoordinates}
+                  boundingBoxPolygon={boundingBoxPolygon}
+                  userBoundingBoxPolygon={userBoundingBoxPolygon}
+                  setUserBoundingBoxPolygon={setUserBoundingBoxPolygon}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Neighborhood Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter neighborhood name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe your neighborhood"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="rules"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rules</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter neighborhood rules"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {error && <p className="text-red-500">{error}</p>}
+            </>
           )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Describe your neighborhood" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="rules"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Rules</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Enter neighborhood rules" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {error && <p className="text-red-500">{error}</p>}
+        </>
       </form>
     </Form>
   );

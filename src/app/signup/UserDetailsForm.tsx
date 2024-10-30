@@ -53,7 +53,6 @@ export default function UserDetailsForm({
       });
 
       if (response.ok) {
-        const userData = await response.json();
         const { user, error } = await refreshAuth();
         if (error) throw error;
         onNext(user);

@@ -4,6 +4,9 @@ import { Lucia, TimeSpan, Session } from "lucia";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { User } from "@prisma/client";
+import { randomUUID } from "crypto";
+
+const COOKIE_SID_NAME = "sid";
 
 export const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
@@ -15,7 +18,7 @@ export const lucia = new Lucia(adapter, {
 const sendErrorResponse = (message?: string, status = 400) => {
   return NextResponse.json(
     { error: message ?? "Internal Server Error" },
-    { status },
+    { status }
   );
 };
 
@@ -33,7 +36,7 @@ export const createUser = async (req: Request) => {
     // 1. Verify the payload
     if (!email || !password || !firstName || !lastName || !address) {
       return sendErrorResponse(
-        "Email, password, name and address are required.",
+        "Email, password, name and address are required."
       );
     }
 
@@ -122,6 +125,11 @@ const loginUserInternal = async (email: string, password: string) => {
     sameSite: "lax",
     maxAge: 2 * 7 * 24 * 60 * 60, // 2 weeks in seconds
   });
+  response.cookies.set(COOKIE_SID_NAME, randomUUID(), {
+    httpOnly: false,
+    sameSite: "lax",
+    maxAge: 2 * 7 * 24 * 60 * 60, // 2 weeks in seconds
+  });
   return response;
 };
 
@@ -133,6 +141,7 @@ export const logoutUser = async (req: Request) => {
   const { user } = await getSession(sessionId);
   const response = NextResponse.json({ message });
   response.cookies.set(lucia.sessionCookieName, "", { maxAge: -1 });
+  response.cookies.set(COOKIE_SID_NAME, "", { maxAge: -1 });
   if (!user || !user.id) {
     message = "user already logged out!";
   } else {
@@ -142,7 +151,7 @@ export const logoutUser = async (req: Request) => {
 };
 
 export const getSession = async (
-  sessionId?: string | null,
+  sessionId?: string | null
 ): Promise<{ user: Partial<User> | null; session: Session | null }> => {
   const empty = {
     user: null,

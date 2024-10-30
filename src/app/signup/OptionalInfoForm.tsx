@@ -53,9 +53,13 @@ export default function OptionalInfoForm({
         if (data[key]) formData.append(key, data[key]);
       });
 
-      const response = await fetch(`/api/users/${userData.id}`, {
+      const response = await fetch(`/api/auth/profile`, {
         method: "PATCH",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -65,7 +69,7 @@ export default function OptionalInfoForm({
         const errorData = await response.json();
         setError(
           errorData.message ||
-            "An error occurred while updating user information",
+            "An error occurred while updating user information"
         );
       }
     } catch (err) {
@@ -133,12 +137,6 @@ export default function OptionalInfoForm({
           )}
         />
         {error && <p className="text-red-500">{error}</p>}
-        <div className="flex justify-between">
-          <Button type="button" onClick={onPrevious} variant="outline">
-            Previous
-          </Button>
-          <Button type="submit">Finish</Button>
-        </div>
       </form>
     </Form>
   );

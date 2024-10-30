@@ -9,7 +9,7 @@ const URI = `https://nominatim.openstreetmap.org/search?q=${ADDRESS_INPUT}&forma
 
 export const checkNeighborhood = (
   coordinates: Coordinates,
-  neighborhoods: Neighborhood[],
+  neighborhoods: Neighborhood[]
 ): Neighborhood | null => {
   for (const neighborhood of neighborhoods) {
     const boundaries: Coordinates[] = [];
@@ -26,12 +26,11 @@ export const checkNeighborhood = (
 
 export const getCoordinates = async (address: string): Promise<OpenMapData> => {
   const response = await fetch(
-    URI.replace(ADDRESS_INPUT, encodeURIComponent(address)),
+    URI.replace(ADDRESS_INPUT, encodeURIComponent(address))
   );
   const data = (await response.json()) as OpenMapData[];
   if (data.length > 0) {
     const place = data.find((place) => place.class === "place");
-    const { lat, lon } = place ?? data[0];
     return place ?? data[0];
   }
   throw new Error("Address not found");
@@ -45,7 +44,7 @@ export async function GET(request: Request) {
     if (!address) {
       return NextResponse.json(
         { error: "Address is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -60,17 +59,28 @@ export async function GET(request: Request) {
     const neighborhood = checkNeighborhood(coordinates, neighborhoods);
 
     if (neighborhood) {
-      return NextResponse.json({ neighborhood }, { status: 200 });
+      const result = await prisma.neighborhood.findUnique({
+        where: {
+          id: neighborhood.id,
+        },
+        include: {
+          users: true,
+          posts: true,
+          events: true,
+          Alert: true,
+        },
+      });
+      return NextResponse.json({ neighborhood: result }, { status: 200 });
     } else {
       return NextResponse.json(
         { message: "No neighborhood found", place },
-        { status: 200 },
+        { status: 200 }
       );
     }
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message ?? "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
