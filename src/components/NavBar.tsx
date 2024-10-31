@@ -29,7 +29,7 @@ function Dot() {
 export function NavBar() {
   const pathName = usePathname();
   return (
-    <div className="fixed bottom-0 border-gray-100 border-2 left-0 bg-white shadow-xl rounded-full w-full h-16 mb-1">
+    <div className="fixed bottom-0 left-0 bg-white rounded-t-2xl w-full h-16">
       <ul className="flex justify-around items-center h-full">
         <li
           className={

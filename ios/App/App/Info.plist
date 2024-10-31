@@ -46,6 +46,7 @@
 	<key>WKAppBoundDomains</key>
 	<array>
 		<string>ngrok-free.app</string>
+		<string>loca.lt</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>

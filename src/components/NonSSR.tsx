@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react";
 import { defineCustomElements } from "@ionic/pwa-elements/loader";
 import { Device, DeviceInfo } from "@capacitor/device";
-import useAuth from "@/hooks/useAuth";
 import { AuthMiddleware } from "./AuthMiddleware";
 
 const LoadNonSSR = ({ showInfo = false }: { showInfo?: boolean }) => {
