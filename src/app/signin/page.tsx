@@ -1,11 +1,11 @@
-"use server";
+"use client";
 
 import { Logo } from "@/components/Header";
-import { InputForm } from "@/components/SigninForm1";
-import { ChevronRight } from "lucide-react";
+import { SigninForm } from "./SigninForm";
+import withAuthRedirect from "@/hoc/withAuthRedirect";
 import Link from "next/link";
 
-const SigninPage = async () => {
+const SigninPage = () => {
   return (
     <section className="flex flex-col md:flex-row max-h-dvh items-center">
       <div className="bg-gradient-to-br from-[#6aa83e] to-[#88ba65] hidden sm:block w-full md:w-1/2 xl:w-2/3 h-screen relative">
@@ -31,7 +31,7 @@ const SigninPage = async () => {
           <h1 className="text-xl md:text-2xl font-bold leading-tight mt-4">
             Log in to your account
           </h1>
-          <InputForm />
+          <SigninForm />
           <hr className="my-6 border-gray-300 w-full" />
 
           <p className="mt-8">
@@ -57,4 +57,4 @@ const SigninPage = async () => {
   );
 };
 
-export default SigninPage;
+export default withAuthRedirect(SigninPage);

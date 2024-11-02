@@ -1,9 +1,7 @@
-"use client";
-
 import { Header } from "@/components/Header";
 import { NavBar } from "@/components/NavBar";
 
-export function OnlyMobile({ children }: React.PropsWithChildren) {
+function OnlyMobile({ children }: React.PropsWithChildren) {
   return <div className="sm:hidden">{children}</div>;
 }
 

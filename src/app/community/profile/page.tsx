@@ -1,6 +1,8 @@
-import { Profile } from "@/components/Profile";
+"use client";
+import { Profile } from "@/app/community/profile/Profile";
+import withAuthRedirect from "@/hoc/withAuthRedirect";
 
-const SigninPage = async () => {
+const SigninPage = () => {
   return (
     <div className="flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -10,4 +12,4 @@ const SigninPage = async () => {
   );
 };
 
-export default SigninPage;
+export default withAuthRedirect(SigninPage);

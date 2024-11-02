@@ -13,7 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import useAuth from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -23,12 +24,8 @@ const formSchema = z.object({
   address: z.string().min(5),
 });
 
-export default function UserDetailsForm({
-  onNext,
-}: {
-  onNext: (userData: any) => void;
-}) {
-  const { refreshAuth, loading: authLoading } = useAuth();
+export default function UserDetailsForm() {
+  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -53,9 +50,7 @@ export default function UserDetailsForm({
       });
 
       if (response.ok) {
-        const { user, error } = await refreshAuth();
-        if (error) throw error;
-        onNext(user);
+        router.replace("./community/profile/neighborhood");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "An error occurred during signup");
@@ -67,6 +62,9 @@ export default function UserDetailsForm({
     }
   };
 
+  if (loading) {
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -77,7 +75,11 @@ export default function UserDetailsForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your email" {...field} />
+                <Input
+                  className="bg-white"
+                  placeholder="Enter your email"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,6 +94,7 @@ export default function UserDetailsForm({
               <FormControl>
                 <Input
                   type="password"
+                  className="bg-white"
                   placeholder="Enter your password"
                   {...field}
                 />
@@ -107,7 +110,11 @@ export default function UserDetailsForm({
             <FormItem>
               <FormLabel>First Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your first name" {...field} />
+                <Input
+                  className="bg-white"
+                  placeholder="Enter your first name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -120,7 +127,11 @@ export default function UserDetailsForm({
             <FormItem>
               <FormLabel>Last Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your last name" {...field} />
+                <Input
+                  className="bg-white"
+                  placeholder="Enter your last name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -133,13 +144,21 @@ export default function UserDetailsForm({
             <FormItem>
               <FormLabel>Address</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your address" {...field} />
+                <Input
+                  className="bg-white"
+                  placeholder="Enter your address"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         {error && <p className="text-red-500">{error}</p>}
+
+        <Button type="submit" className="my-2 bg-orange-600 font-semibold">
+          Create
+        </Button>
       </form>
     </Form>
   );

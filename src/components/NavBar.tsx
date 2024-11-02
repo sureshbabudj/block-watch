@@ -1,5 +1,7 @@
 "use client";
 
+import { userAtom } from "@/lib/appStore";
+import { useAtom } from "jotai";
 import {
   CalendarDays,
   CircleUserRound,
@@ -28,15 +30,18 @@ function Dot() {
 
 export function NavBar() {
   const pathName = usePathname();
+  const user = useAtom(userAtom);
   return (
     <div className="fixed bottom-0 left-0 bg-white rounded-t-2xl w-full h-16">
       <ul className="flex justify-around items-center h-full">
         <li
           className={
-            pathName === "/" ? " text-orange-500" : "text-gray-400 relative"
+            pathName === "/community"
+              ? " text-orange-500"
+              : "text-gray-400 relative"
           }
         >
-          <Link href="/">
+          <Link href={user ? "/community" : "/"}>
             <HomeIcon />
           </Link>
         </li>
@@ -47,7 +52,7 @@ export function NavBar() {
               : "text-gray-400 relative"
           }
         >
-          <Link href="/main">
+          <Link href="/community">
             <Dot />
             <MessageSquareWarning />
           </Link>
@@ -59,18 +64,18 @@ export function NavBar() {
               : "text-gray-400 relative"
           }
         >
-          <Link href="/signin">
+          <Link href="/community">
             <CalendarDays />
           </Link>
         </li>
         <li
           className={
-            pathName.startsWith("/profile")
+            pathName.startsWith("/community/profile")
               ? "relative text-orange-500"
               : "text-gray-400 relative"
           }
         >
-          <Link href="/profile">
+          <Link href="/community/profile">
             <CircleUserRound />
           </Link>
         </li>

@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react";
 import { defineCustomElements } from "@ionic/pwa-elements/loader";
 import { Device, DeviceInfo } from "@capacitor/device";
-import { AuthMiddleware } from "./AuthMiddleware";
 
 const LoadNonSSR = ({ showInfo = false }: { showInfo?: boolean }) => {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
@@ -26,7 +25,7 @@ const LoadNonSSR = ({ showInfo = false }: { showInfo?: boolean }) => {
 
   return (
     <>
-      <AuthMiddleware />
+      {/* <AuthMiddleware /> */}
       {showInfo && (
         <div>
           {deviceInfo && (

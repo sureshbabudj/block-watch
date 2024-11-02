@@ -38,7 +38,10 @@ export function Header() {
       <nav className="flex relative justify-between items-center mx-auto px-8 h-16 max-w-screen-xl">
         {/* <!-- logo --> */}
         <div className="inline-flex">
-          <Link href="/" className="font-semibold text-lg">
+          <Link
+            href={user ? "/community" : "/"}
+            className="font-semibold text-lg"
+          >
             <div className="hidden md:flex flex-row items-center justify-center gap-2">
               <Logo />
               Block Watch

@@ -1,5 +1,6 @@
 "use client";
 
+import withAuthRedirect from "@/hoc/withAuthRedirect";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,20 +18,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Coordinates, ExtendedNeighborhood, OpenMapData } from "@/types";
-import { LoggedInUser } from "@/lib/appStore";
+import { userAtom } from "@/lib/appStore";
 import NeighborhoodView from "./NeighborhoodView";
+import { useAtom } from "jotai";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   name: z.string().min(2),
   description: z.string().min(10),
   rules: z.string().min(10),
 });
-
-interface NeighborhoodSelectionProps {
-  onNext: (userData: any) => void;
-  onPrevious: (userData: any) => void;
-  userData: LoggedInUser;
-}
 
 type BoundaryInput = [number, number];
 
@@ -66,11 +64,15 @@ const getBoundingbox = (boundingBox: OpenMapData["boundingbox"]) => {
   return [southWest, northWest, northEast, southEast, southWest];
 };
 
-export default function NeighborhoodSelection({
-  onNext,
-  onPrevious,
-  userData,
-}: NeighborhoodSelectionProps) {
+function NeighborhoodSelectionPage(): JSX.Element {
+  const router = useRouter();
+  const [user] = useAtom(userAtom);
+
+  if (!user) {
+    router.replace("/signin");
+    return <></>;
+  }
+
   const [error, setError] = useState("");
   const [initialCoordinates, setInitialCoordinates] =
     useState<Coordinates | null>(null);
@@ -131,7 +133,7 @@ export default function NeighborhoodSelection({
         : boundingBoxPolygon;
     if (inputBoundaries.length === 0) {
       setError("Please draw your neighborhood boundaries on the map");
-      return;
+      return <></>;
     }
 
     const formattedBoundaries = formatBoundaries(inputBoundaries);
@@ -143,13 +145,13 @@ export default function NeighborhoodSelection({
         body: JSON.stringify({
           ...data,
           boundaries: formattedBoundaries,
-          userId: userData.id,
+          userId: user.id,
         }),
       });
 
       if (response.ok) {
-        const neighborhoodData = await response.json();
-        onNext({ ...userData, neighborhood: neighborhoodData });
+        await response.json();
+        router.replace("/community/profile/update");
       } else {
         const errorData = await response.json();
         setError(
@@ -163,29 +165,17 @@ export default function NeighborhoodSelection({
   };
 
   useEffect(() => {
-    getNeighborhood(userData.address);
-  }, [userData.address]);
+    getNeighborhood(user.address);
+  }, [user]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  const handleOnNext = () => {
-    onNext({ ...userData, neighborhood: selectedNeighborhood });
-  };
-
   if (selectedNeighborhood) {
-    form.setValue("name", selectedNeighborhood.name);
-    form.setValue("description", selectedNeighborhood.description);
-    form.setValue("rules", selectedNeighborhood.rules);
-    return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleOnNext)} className="space-y-4">
-          <NeighborhoodView neighborhood={selectedNeighborhood} />
-        </form>
-      </Form>
-    );
+    return <NeighborhoodView neighborhood={selectedNeighborhood} />;
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -209,7 +199,11 @@ export default function NeighborhoodSelection({
                   <FormItem>
                     <FormLabel>Neighborhood Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter neighborhood name" {...field} />
+                      <Input
+                        placeholder="Enter neighborhood name"
+                        {...field}
+                        className="bg-white"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -248,6 +242,13 @@ export default function NeighborhoodSelection({
                 )}
               />
               {error && <p className="text-red-500">{error}</p>}
+
+              <Button
+                type="submit"
+                className="my-2 bg-orange-600 font-semibold"
+              >
+                Add Neighborhood
+              </Button>
             </>
           )}
         </>
@@ -255,3 +256,5 @@ export default function NeighborhoodSelection({
     </Form>
   );
 }
+
+export default withAuthRedirect(NeighborhoodSelectionPage);

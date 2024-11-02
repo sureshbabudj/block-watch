@@ -14,6 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import withAuthRedirect from "@/hoc/withAuthRedirect";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
@@ -23,17 +25,8 @@ const formSchema = z.object({
   dateOfBirth: z.string().optional(),
 });
 
-interface OptionalInfoFormProps {
-  onSubmit: (userData: any) => void;
-  onPrevious: (userData: any) => void;
-  userData: any;
-}
-
-export default function OptionalInfoForm({
-  onSubmit,
-  onPrevious,
-  userData,
-}: OptionalInfoFormProps) {
+function ProfileUpdatePage() {
+  const router = useRouter();
   const [error, setError] = useState("");
 
   const form = useForm({
@@ -63,8 +56,8 @@ export default function OptionalInfoForm({
       });
 
       if (response.ok) {
-        const updatedUserData = await response.json();
-        onSubmit(updatedUserData);
+        await response.json();
+        router.replace("/community/profile");
       } else {
         const errorData = await response.json();
         setError(
@@ -137,7 +130,13 @@ export default function OptionalInfoForm({
           )}
         />
         {error && <p className="text-red-500">{error}</p>}
+
+        <Button type="submit" className="my-2 bg-orange-600 font-semibold">
+          Update Neighborhood
+        </Button>
       </form>
     </Form>
   );
 }
+
+export default withAuthRedirect(ProfileUpdatePage);

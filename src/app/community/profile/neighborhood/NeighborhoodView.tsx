@@ -1,4 +1,5 @@
 import { ExtendedNeighborhood } from "@/types";
+import Link from "next/link";
 
 const NeighborhoodView = ({
   neighborhood,
@@ -88,6 +89,13 @@ const NeighborhoodView = ({
           <p className="text-gray-500">No alerts found.</p>
         )}
       </div>
+
+      <Link
+        href="/community/profile/update"
+        className="rounded-lg my-4 bg-orange-600 text-white px-4 py-2 block font-semibold text-center"
+      >
+        Update Profile
+      </Link>
     </div>
   );
 };

@@ -7,7 +7,7 @@ import { Coordinates, OpenMapData } from "@/types";
 const ADDRESS_INPUT = "ADDRESS_INPUT";
 const URI = `https://nominatim.openstreetmap.org/search?q=${ADDRESS_INPUT}&format=json&addressdetails=1`;
 
-export const checkNeighborhood = (
+const checkNeighborhood = (
   coordinates: Coordinates,
   neighborhoods: Neighborhood[]
 ): Neighborhood | null => {
@@ -24,7 +24,7 @@ export const checkNeighborhood = (
   return null;
 };
 
-export const getCoordinates = async (address: string): Promise<OpenMapData> => {
+const getCoordinates = async (address: string): Promise<OpenMapData> => {
   const response = await fetch(
     URI.replace(ADDRESS_INPUT, encodeURIComponent(address))
   );

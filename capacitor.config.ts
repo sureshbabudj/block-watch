@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: "block-watch",
   webDir: "out",
   server: {
-    url: "https://shy-cars-lie.loca.lt",
+    url: "https://curvy-eels-learn.loca.lt",
   },
 
   ios: { contentInset: "always", scrollEnabled: true },

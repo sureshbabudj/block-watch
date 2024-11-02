@@ -7,5 +7,9 @@ import { SignoutAction } from "./SignoutAction";
 export function Profile() {
   const [user] = useAtom(userAtom);
   const displayUser = user && user.id ? user.firstName : "Guest";
-  return <p>Welcome {displayUser}!  {user && user.id && <SignoutAction />}</p>;
+  return (
+    <p>
+      Welcome {displayUser}! {user && user.id && <SignoutAction />}
+    </p>
+  );
 }

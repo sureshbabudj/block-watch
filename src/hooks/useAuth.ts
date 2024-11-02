@@ -1,3 +1,4 @@
+// useAuth.ts
 import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { LoggedInUser, userAtom } from "@/lib/appStore";
@@ -59,6 +60,9 @@ const useAuth = () => {
   useEffect(() => {
     if (!user) {
       fetchUser();
+    } else {
+      setLoading(false);
+      setError(null);
     }
   }, []);
 

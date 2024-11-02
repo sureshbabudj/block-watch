@@ -15,8 +15,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
   email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
@@ -27,7 +27,8 @@ const FormSchema = z.object({
   }),
 });
 
-export function InputForm() {
+export function SigninForm() {
+  const router = useRouter();
   const { refreshAuth } = useAuth();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -51,6 +52,7 @@ export function InputForm() {
 
     if (response.ok) {
       refreshAuth();
+      router.replace("/community");
     } else {
       form.setError("password", { message: "Invalid Password" });
       await Toast.show({
@@ -97,7 +99,9 @@ export function InputForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="my-2 bg-orange-600 font-semibold">
+          Submit
+        </Button>
       </form>
     </Form>
   );
