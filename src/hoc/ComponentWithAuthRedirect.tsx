@@ -4,6 +4,8 @@ import { useEffect, ComponentType, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import { Loader } from "@/components/Loader";
+import { useAtom } from "jotai";
+import { isMenuOpenAtom } from "@/lib/appStore";
 
 interface ComponentWithAuthRedirectProps {
   // Define any additional props your component might need
@@ -15,15 +17,13 @@ export const ComponentWithAuthRedirect = <
   WrappedComponent: ComponentType<P>
 ) => {
   const Component = (props: P) => {
-    const { user, loading: authLoading } = useAuth();
-    const [loading, setLoading] = useState(authLoading);
+    const { user, loading } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
+    const [_open, setMenuOpen] = useAtom(isMenuOpenAtom);
 
     useEffect(() => {
-      const bodyElm = document.querySelector("body");
       if (!loading) {
-        if (bodyElm) bodyElm.style.overflow = "auto";
         if (user) {
           if (pathname === "/signin" || pathname === "/signup") {
             router.replace("/community");
@@ -33,11 +33,9 @@ export const ComponentWithAuthRedirect = <
             router.replace("/signin");
           }
         }
-      } else {
-        if (bodyElm) bodyElm.style.overflow = "hidden";
       }
-      setLoading(authLoading);
-    }, [user, router, authLoading]);
+      setMenuOpen(false);
+    }, [user, router, loading]);
 
     if (loading) {
       return <Loader />;

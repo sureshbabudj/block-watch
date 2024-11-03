@@ -72,6 +72,7 @@ export function SigninForm() {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
+                  type="email"
                   placeholder="Enter Email"
                   {...field}
                   className="bg-white"

@@ -1,13 +1,23 @@
 "use client";
 
-import { Bell, ChevronLeft, Search } from "lucide-react";
-import Image from "next/image";
+import {
+  Heart,
+  MenuIcon,
+  MessageCircle,
+  Search,
+  SearchIcon,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { userAtom } from "@/lib/appStore";
+import { isMenuOpenAtom, userAtom } from "@/lib/appStore";
 import { useAtom } from "jotai";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { SignoutAction } from "@/app/community/profile/SignoutAction";
 export function Logo() {
   return (
     <svg
@@ -33,9 +43,19 @@ export function Logo() {
 
 export function Header() {
   const [user] = useAtom(userAtom);
+  const [open, setMenuOpen] = useAtom(isMenuOpenAtom);
+
+  const openMenu = () => {
+    setMenuOpen(true);
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
-    <div className="fixed sm:static top-0 left-0 w-full bg-white">
-      <nav className="flex relative justify-between items-center mx-auto px-8 h-16 max-w-screen-xl">
+    <header className="flex bg-white border-b px-4 py-1 mb-[5px] tracking-wide max-sm:fixed max-sm:top-0 max-sm:left-0 max-sm:w-full max-sm:z-10">
+      <div className="flex flex-wrap items-center lg:gap-y-2 gap-4 w-full">
         {/* <!-- logo --> */}
         <div className="inline-flex">
           <Link
@@ -52,60 +72,164 @@ export function Header() {
           </Link>
         </div>
         {/* <!-- end logo --> */}
-
-        {/* <!-- search bar --> */}
-        <div className="hidden sm:block justify-start px-2">
-          <div className="relative">
-            <Input
-              type="email"
-              placeholder="text"
-              className="rounded-full px-4"
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-0 top-0 h-8 w-8 m-1 rounded-full"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
+        {/* menu */}
+        <div
+          id="collapseMenu"
+          className={cn(
+            { "max-lg:hidden": !open },
+            { "max-lg:block": open },
+            "lg:ml-10 lg:!block max-lg:before:fixed max-lg:before:bg-black max-lg:before:opacity-50 max-lg:before:inset-0 max-lg:before:z-50"
+          )}
+        >
+          <Button
+            variant={"ghost"}
+            size={"icon"}
+            id="toggleClose"
+            onClick={closeMenu}
+            className="lg:hidden fixed top-2 right-4 z-[100] rounded-full bg-white p-3"
+          >
+            <X />
+          </Button>
+          <ul className="lg:flex lg:gap-x-3 max-lg:space-y-3 max-lg:fixed max-lg:bg-white max-lg:w-1/2 max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50">
+            <li className="max-lg:border-b max-lg:py-3 px-3">
+              <Link
+                href={user ? "/community" : "/"}
+                className="text-[#007bff] hover:text-[#007bff] text-[15px] block font-semibold"
+              >
+                Home
+              </Link>
+            </li>
+            <li className="max-lg:border-b max-lg:py-3 px-3">
+              <Link
+                href="/community"
+                className="text-[#333] hover:text-[#007bff] text-[15px] block font-semibold"
+              >
+                Neighbourhood
+              </Link>
+            </li>
+            <li className="max-lg:border-b max-lg:py-3 px-3">
+              <Link
+                href="/community/profile"
+                className="text-[#333] hover:text-[#007bff] text-[15px] block font-semibold"
+              >
+                Profile
+              </Link>
+            </li>
+            <li className="max-lg:border-b max-lg:py-3 px-3">
+              <Link
+                href="/"
+                className="text-[#333] hover:text-[#007bff] text-[15px] block font-semibold"
+              >
+                Messages
+              </Link>
+            </li>
+          </ul>
         </div>
-        {/* <!-- end search bar --> */}
-
-        {/* <!-- login --> */}
-        <div className="flex-initial">
-          <div className="flex justify-end items-center relative">
-            <div className="flex mr-4 items-center">
-              <div className="block sm:hidden">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="block relative">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Bell className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="block">
-              <Button variant="ghost" className="rounded-full w-10 h-10">
-                <Avatar className="hover:border-2">
-                  {user?.profilePicture ? (
-                    <AvatarImage
-                      src={user.profilePicture}
-                      alt={user.firstName}
-                    />
-                  ) : (
-                    <AvatarFallback>G</AvatarFallback>
-                  )}
-                </Avatar>
+        {/* end menu */}
+        <div className="flex gap-x-6 gap-y-4 ml-auto">
+          {/* <!-- search bar --> */}
+          <div className="hidden sm:block justify-start px-2">
+            <div className="relative">
+              <Input
+                type="email"
+                placeholder="text"
+                className="rounded-full px-4"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-8 w-8 m-1 rounded-full"
+              >
+                <Search className="h-4 w-4" />
               </Button>
             </div>
           </div>
+          {/* <!-- end search bar --> */}
+          <div className="flex items-center space-x-4 sm:space-x-8">
+            {/* search icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full pl-3 block sm:hidden"
+            >
+              <SearchIcon />
+            </Button>
+            {/* end search icon */}
+            {/* Heart Icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full relative max-[420px]:hidden"
+            >
+              <Heart />
+              <span className="absolute right-1 -mr-1 top-1 rounded-full bg-red-500 px-1 py-0 text-xs text-white">
+                0
+              </span>
+            </Button>
+            {/* End Heart Icon */}
+            {/* Message Icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full relative"
+            >
+              <MessageCircle />
+              <span className="absolute right-1 -mr-1 top-1 rounded-full bg-red-500 px-1 py-0 text-xs text-white">
+                0
+              </span>
+            </Button>
+            {/* End Message Icon */}
+            {/* Avatar */}
+            <>
+              {!user ? (
+                <button className="px-5 py-2 text-sm rounded-full text-white border-2 border-[#007bff] bg-[#007bff] hover:bg-[#004bff]">
+                  Sign In
+                </button>
+              ) : (
+                <div className="block">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="rounded-full w-10 h-10"
+                      >
+                        <Avatar className="hover:border-2">
+                          {user.profilePicture ? (
+                            <AvatarImage
+                              src={user.profilePicture}
+                              alt={user.firstName}
+                            />
+                          ) : (
+                            <AvatarFallback>
+                              {user
+                                ? `${user.firstName.split("")[0]}${user.lastName.split("")[0]}`
+                                : "G"}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto m-1 p-0 ">
+                      <ul className="bg-white px-4 py-3 space-y-4 rounded-lg">
+                        <li className="border-b hover:bg-gray-50 px-4 py-2 rounded">
+                          <Link href="/community/profile/update">Profile</Link>
+                        </li>
+                        <li className="last:border-b-0 hover:bg-gray-50 hover:text-red-600 px-4 py-2 rounded">
+                          <SignoutAction />
+                        </li>
+                      </ul>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+            </>
+            {/* End Avatar */}
+            <button onClick={openMenu} className="lg:hidden">
+              <MenuIcon />
+            </button>
+          </div>
         </div>
-        {/* <!-- end login --> */}
-      </nav>
-    </div>
+      </div>
+    </header>
   );
 }

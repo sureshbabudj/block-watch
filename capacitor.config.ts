@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: "block-watch",
   webDir: "out",
   server: {
-    url: "https://curvy-eels-learn.loca.lt",
+    url: "https://38f5-87-178-167-113.ngrok-free.app",
   },
 
   ios: { contentInset: "always", scrollEnabled: true },
