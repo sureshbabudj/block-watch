@@ -3,9 +3,7 @@ import { Provider } from "jotai";
 import NonSSR from "@/components/NonSSR";
 import { Barlow } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/NavBar";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/Header";
 
 const barlow = Barlow({ weight: "500", subsets: ["latin", "latin-ext"] });
 

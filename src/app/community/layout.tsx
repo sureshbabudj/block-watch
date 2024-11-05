@@ -7,12 +7,14 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="max-sm:overflow-hidden">
+    <>
       <Header />
-      <main className="max-sm:py-16 max-sm:h-[100dvh] max-sm:overflow-y-auto px-2">
-        {children}
-      </main>
+      <div className="max-sm:overflow-hidden ">
+        <main className="max-sm:my-20 max-sm:h-[calc(100dvh - 10rem)] max-sm:overflow-y-auto">
+          {children}
+        </main>
+      </div>
       <NavBar />
-    </div>
+    </>
   );
 }
