@@ -137,7 +137,7 @@ const loginUserInternal = async (email: string, password: string) => {
 export const logoutUser = async (req: Request) => {
   let message = "Logout successful";
   const sessionId =
-    (req as any).cookies.get(lucia.sessionCookieName).value ?? null;
+    (req as any).cookies.get(lucia.sessionCookieName)?.value ?? null;
   const { user } = await getSession(sessionId);
   const response = NextResponse.json({ message });
   response.cookies.set(lucia.sessionCookieName, "", { maxAge: -1 });

@@ -26,11 +26,11 @@ export const ComponentWithAuthRedirect = <
       if (!loading) {
         if (user) {
           if (pathname === "/signin" || pathname === "/signup") {
-            router.replace("/community");
+            router.push("/community");
           }
         } else {
           if (pathname.startsWith("/community")) {
-            router.replace("/signin");
+            router.push("/signin", { scroll: false });
           }
         }
       }

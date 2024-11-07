@@ -94,7 +94,7 @@ function NeighborhoodSelectionPage({
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      name: user.address,
       description: "",
       rules: "",
     },
@@ -213,7 +213,7 @@ function NeighborhoodSelectionPage({
                       <Input
                         placeholder="Enter neighborhood name"
                         {...field}
-                        className="bg-white"
+                        className="bg-white text-base"
                       />
                     </FormControl>
                     <FormMessage />
@@ -228,6 +228,7 @@ function NeighborhoodSelectionPage({
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
+                        className="text-base"
                         placeholder="Describe your neighborhood"
                         {...field}
                       />
@@ -244,6 +245,7 @@ function NeighborhoodSelectionPage({
                     <FormLabel>Rules</FormLabel>
                     <FormControl>
                       <Textarea
+                        className="text-base"
                         placeholder="Enter neighborhood rules"
                         {...field}
                       />
@@ -254,10 +256,7 @@ function NeighborhoodSelectionPage({
               />
               {error && <p className="text-red-500">{error}</p>}
 
-              <Button
-                type="submit"
-                className="my-2 bg-orange-600 font-semibold"
-              >
+              <Button type="submit" className="">
                 Add Neighborhood
               </Button>
             </>

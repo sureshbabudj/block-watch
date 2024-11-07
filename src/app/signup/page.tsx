@@ -26,6 +26,7 @@ function SignupWizard() {
         Already have an account?{" "}
         <Link
           href="/signin"
+          scroll={false}
           className="text-blue-500 hover:text-blue-700 font-semibold"
         >
           Login
@@ -34,6 +35,7 @@ function SignupWizard() {
       <p className="mt-8">
         <Link
           href="/"
+          scroll={false}
           className="text-blue-500 hover:text-blue-700 font-semibold"
         >
           Go back!

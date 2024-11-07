@@ -26,7 +26,13 @@ export default function RootLayout({
             content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
         </head>
-        <body className={cn(barlow.className, `antialiased`)}>
+        <body
+          className={cn(barlow.className, `antialiased`)}
+          style={{
+            padding:
+              "env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)",
+          }}
+        >
           {children}
           <NonSSR showInfo={false} />
         </body>

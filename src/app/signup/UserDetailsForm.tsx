@@ -50,7 +50,7 @@ export default function UserDetailsForm() {
       });
 
       if (response.ok) {
-        router.replace("./community/profile/neighborhood");
+        router.replace("./community/profile/update/neighborhood");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "An error occurred during signup");
@@ -76,6 +76,8 @@ export default function UserDetailsForm() {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
+                  autoCapitalize="off"
+                  type="email"
                   className="bg-white"
                   placeholder="Enter your email"
                   {...field}

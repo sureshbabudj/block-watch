@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/select";
 import { useAtom } from "jotai";
 import { userAtom } from "@/lib/appStore";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Popover,

@@ -26,6 +26,7 @@ export default function Page() {
 
           <Link
             href="/signin"
+            scroll={false}
             className={`
               inline-flex items-center justify-center px-10 py-3 text-xl w-[80%] absolute bottom-5
               font-semibold leading-6 text-white whitespace-no-wrap

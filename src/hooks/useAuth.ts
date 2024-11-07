@@ -26,6 +26,7 @@ const useAuth = () => {
     };
     // if no sid, there is no session
     if (!getCookie("sid")) {
+      setUser(null);
       setLoading(false);
       return result;
     }

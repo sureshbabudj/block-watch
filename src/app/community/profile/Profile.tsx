@@ -3,21 +3,18 @@
 import { userAtom } from "@/lib/appStore";
 import { useAtom } from "jotai";
 import { SignoutAction } from "./SignoutAction";
-import { useRouter } from "next/navigation";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@radix-ui/react-select";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export function Profile() {
-  const router = useRouter();
   const [user] = useAtom(userAtom);
 
   if (!user) {
-    router.replace("/signin");
-    return <></>;
+    return null;
   }
 
   return (
@@ -39,11 +36,11 @@ export function Profile() {
             {user.firstName} {user.lastName}
           </p>
           <p className="text-xl">{user.address}</p>
-          <Separator className="border border-gray-100 w-[calc(100%_-_10%)] sm:!my-12" />
+          <Separator className=" my-8 sm:!my-12" />
           <p className="text-xl text-center">{user.bio}</p>
-          <Separator className="border border-gray-100 w-[calc(100%_-_10%)] sm:!my-12" />
+          <Separator className=" my- sm:!my-12" />
           <ScrollArea className="w-full">
-            <div className="flex flex-row space-x-8 justify-around">
+            <div className="flex flex-row space-x-8 justify-around py-4">
               {user.dateOfBirth && (
                 <div className="text-center">
                   <p>Born</p>
@@ -74,7 +71,7 @@ export function Profile() {
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
-          <Separator className="border border-gray-100 w-[calc(100%_-_10%)] sm:!my-12" />
+          <Separator className=" sm:!my-12" />
           <div className="flex flex-row justify-between self-stretch items-center">
             <Button asChild>
               <Link href="/community/profile/update">update profile</Link>

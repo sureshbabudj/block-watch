@@ -1,10 +1,9 @@
-import { userAtom } from "@/lib/appStore";
+import useAuth from "@/hooks/useAuth";
 import { Toast } from "@capacitor/toast";
-import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 
 export function SignoutAction() {
-  const [user, setUser] = useAtom(userAtom);
+  const { refreshAuth } = useAuth();
   const router = useRouter();
   const signout = async () => {
     try {
@@ -16,8 +15,8 @@ export function SignoutAction() {
       const data = await response.json();
 
       if (response.ok) {
-        setUser(null);
-        router.replace("/signin");
+        await refreshAuth();
+        router.push("/signin");
       } else {
         throw data.error;
       }

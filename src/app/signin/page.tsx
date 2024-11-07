@@ -26,6 +26,7 @@ const SigninPage = () => {
       <p className="mt-8">
         Need an account?{" "}
         <Link
+          scroll={false}
           href="/signup"
           className="text-blue-500 hover:text-blue-700 font-semibold"
         >
@@ -35,6 +36,7 @@ const SigninPage = () => {
       <p className="mt-8">
         <Link
           href="/"
+          scroll={false}
           className="text-blue-500 hover:text-blue-700 font-semibold"
         >
           Go back!
