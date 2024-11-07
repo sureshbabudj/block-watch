@@ -36,8 +36,17 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import useAuth from "@/hooks/useAuth";
 
 const genders = ["Male", "Female", "Non Binary", "Prefer not to say"] as const;
+
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+const MAX_FILE_SIZE = 2000000;
 
 const profileFormSchema = z.object({
   firstName: z
@@ -66,46 +75,56 @@ const profileFormSchema = z.object({
       required_error: "Please input an email to display.",
     })
     .email(),
-  bio: z.string().max(160).min(4).optional(),
+  bio: z.string().max(160).optional(),
   dateOfBirth: z.date().optional(),
+  profilePicture:
+    typeof window === "undefined"
+      ? z.any()
+      : z
+          .any()
+          .optional()
+          .refine(
+            (file) =>
+              file.length == 1
+                ? ACCEPTED_IMAGE_TYPES.includes(file?.[0]?.type)
+                  ? true
+                  : false
+                : true,
+            "Invalid file. choose either JPEG or PNG image"
+          )
+          .refine(
+            (file) =>
+              file.length == 1
+                ? file[0]?.size <= MAX_FILE_SIZE
+                  ? true
+                  : false
+                : true,
+            "Max file size allowed is 8MB."
+          ),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
   const router = useRouter();
+  const { refreshAuth } = useAuth();
   const [user] = useAtom(userAtom);
   if (!user) {
     router.replace("/signin");
     return <></>;
   }
-  const [defaultValues, setDafaultvalues] = useState<
-    Partial<ProfileFormValues>
-  >({
-    firstName: user?.firstName ?? "",
-    lastName: user?.lastName ?? "",
-    email: user?.email ?? "",
-    dateOfBirth: user?.dateOfBirth ?? new Date(),
-    gender: user?.gender
+
+  const defaultValues: Partial<ProfileFormValues> = {
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    email: user.email ?? "",
+    dateOfBirth: user.dateOfBirth || undefined,
+    gender: user.gender
       ? (user.gender as (typeof genders)[0])
       : "Prefer not to say",
-    bio: user?.bio ?? "",
-  });
-
-  useEffect(() => {
-    if (user && user.id) {
-      setDafaultvalues({
-        firstName: user?.firstName ?? "",
-        lastName: user?.lastName ?? "",
-        email: user?.email ?? "",
-        dateOfBirth: user?.dateOfBirth ?? new Date(),
-        gender: user?.gender
-          ? (user.gender as (typeof genders)[0])
-          : "Prefer not to say",
-        bio: user?.bio ?? "",
-      });
-    }
-  }, [user]);
+    bio: user.bio ?? "",
+    profilePicture: undefined,
+  };
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -113,11 +132,50 @@ export function ProfileForm() {
     mode: "onChange",
   });
 
-  async function onSubmit(data: ProfileFormValues) {
-    await Toast.show({
-      text: `You submitted the following values: ${JSON.stringify(data, null, 2)}`,
-    });
+  async function onSubmit(formData: ProfileFormValues) {
+    try {
+      const parsed = profileFormSchema.safeParse(formData);
+      if (!parsed.success) {
+        throw "Payload validation failed";
+      }
+      const refinedFormData: any = new FormData();
+      Object.entries(parsed.data).forEach(([key, value]) => {
+        if (value !== undefined) {
+          if (key === "dateOfBirth") {
+            refinedFormData.append(key, new Date(value).toISOString());
+          } else if (key === "profilePicture") {
+            debugger;
+            refinedFormData.append(key, value[0]);
+          } else {
+            refinedFormData.append(key, value);
+          }
+        }
+      });
+      for (const pair of refinedFormData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+      }
+      const response = await fetch(`/api/auth/profile`, {
+        method: "PATCH",
+        body: refinedFormData,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await response.json();
+      await refreshAuth();
+      router.replace("/community/profile");
+    } catch (err: any) {
+      await Toast.show({
+        text:
+          err.message || "An error occurred while updating user information",
+      });
+    }
   }
+
+  const fileRef = form.register("profilePicture");
 
   return (
     <Form {...form}>
@@ -208,6 +266,28 @@ export function ProfileForm() {
         />
         <FormField
           control={form.control}
+          name="profilePicture"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Picture</FormLabel>
+              <FormControl>
+                <Input
+                  className="resize-none"
+                  {...fileRef}
+                  type="file"
+                  accept=".jpg, .jpeg, .png"
+                />
+              </FormControl>
+              <FormDescription>
+                You can upload oan image with the size that does not exceeds
+                1mb.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="dateOfBirth"
           render={({ field }) => (
             <FormItem className="flex flex-col">
@@ -234,7 +314,7 @@ export function ProfileForm() {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    fromYear={1960}
+                    fromYear={1930}
                     toYear={new Date().getFullYear()}
                     selected={field.value}
                     onSelect={field.onChange}

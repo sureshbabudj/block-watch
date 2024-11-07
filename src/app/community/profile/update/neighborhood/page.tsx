@@ -1,5 +1,5 @@
 "use client";
-
+import { use } from "react";
 import withAuthRedirect from "@/hoc/withAuthRedirect";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -64,7 +64,12 @@ const getBoundingbox = (boundingBox: OpenMapData["boundingbox"]) => {
   return [southWest, northWest, northEast, southEast, southWest];
 };
 
-function NeighborhoodSelectionPage(): JSX.Element {
+function NeighborhoodSelectionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { update } = use(searchParams);
   const router = useRouter();
   const [user] = useAtom(userAtom);
 
@@ -114,6 +119,12 @@ function NeighborhoodSelectionPage(): JSX.Element {
         }
         return null;
       }
+      const currentLocation = parseBoundaries(data.neighborhood.boundaries)[0];
+      const coordinates = {
+        lat: parseFloat(currentLocation[0]),
+        lon: parseFloat(currentLocation[1]),
+      };
+      setInitialCoordinates(coordinates);
       setSelectedNeighborhood(data.neighborhood);
     } catch (error: any) {
       console.log(error);
@@ -172,7 +183,7 @@ function NeighborhoodSelectionPage(): JSX.Element {
     return <div>Loading...</div>;
   }
 
-  if (selectedNeighborhood) {
+  if (!update && selectedNeighborhood) {
     return <NeighborhoodView neighborhood={selectedNeighborhood} />;
   }
 

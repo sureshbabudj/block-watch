@@ -1,142 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
+import { ProfileForm } from "./ProfileForm";
 import withAuthRedirect from "@/hoc/withAuthRedirect";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
-const formSchema = z.object({
-  profilePicture: z.any().optional(),
-  bio: z.string().max(500).optional(),
-  gender: z.string().optional(),
-  dateOfBirth: z.string().optional(),
-});
-
-function ProfileUpdatePage() {
-  const router = useRouter();
-  const [error, setError] = useState("");
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      profilePicture: null,
-      bio: "",
-      gender: "",
-      dateOfBirth: "",
-    },
-  });
-
-  const handleSubmit = async (data: any) => {
-    try {
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        if (data[key]) formData.append(key, data[key]);
-      });
-
-      const response = await fetch(`/api/auth/profile`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(Object.fromEntries(formData)),
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        await response.json();
-        router.replace("/community/profile");
-      } else {
-        const errorData = await response.json();
-        setError(
-          errorData.message ||
-            "An error occurred while updating user information"
-        );
-      }
-    } catch (err) {
-      setError("An error occurred while updating user information");
-    }
-  };
-
+function SettingsProfilePage() {
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="profilePicture"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Profile Picture</FormLabel>
-              <FormControl>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => field.onChange(e.target.files?.[0])}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Tell us about yourself" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Gender</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your gender" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dateOfBirth"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date of Birth</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {error && <p className="text-red-500">{error}</p>}
-
-        <Button type="submit" className="my-2 bg-orange-600 font-semibold">
-          Update Neighborhood
-        </Button>
-      </form>
-    </Form>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Profile</h3>
+        <p className="text-sm text-muted-foreground">
+          This is how others will see you on the site.
+        </p>
+      </div>
+      <Separator />
+      <ProfileForm />
+    </div>
   );
 }
 
-export default withAuthRedirect(ProfileUpdatePage);
+export default withAuthRedirect(SettingsProfilePage);

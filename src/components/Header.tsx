@@ -14,7 +14,6 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { isMenuOpenAtom, userAtom } from "@/lib/appStore";
 import { useAtom } from "jotai";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { SignoutAction } from "@/app/community/profile/SignoutAction";
@@ -212,7 +211,7 @@ export function Header() {
                     <PopoverContent className="w-auto m-1 p-0 ">
                       <ul className="bg-white px-4 py-3 space-y-4 rounded-lg">
                         <li className="border-b hover:bg-gray-50 px-4 py-2 rounded">
-                          <Link href="/community/profile/update">Profile</Link>
+                          <Link href="/community/profile">Profile</Link>
                         </li>
                         <li className="last:border-b-0 hover:bg-gray-50 hover:text-red-600 px-4 py-2 rounded">
                           <SignoutAction />

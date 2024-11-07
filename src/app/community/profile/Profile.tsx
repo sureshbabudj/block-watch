@@ -5,160 +5,11 @@ import { useAtom } from "jotai";
 import { SignoutAction } from "./SignoutAction";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
-export function Profile1() {
-  return (
-    <>
-      <main className="profile-page">
-        <section className="relative block h-500-px">
-          <div className="absolute top-0 w-full h-full bg-center bg-cover">
-            <span
-              id="blackOverlay"
-              className="w-full h-full absolute opacity-50 bg-black"
-            ></span>
-          </div>
-          <div
-            className="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-70-px"
-            style={{ transform: "translateZ(0px)" }}
-          >
-            <svg
-              className="absolute bottom-0 overflow-hidden"
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-              version="1.1"
-              viewBox="0 0 2560 100"
-              x="0"
-              y="0"
-            >
-              <polygon
-                className="text-blueGray-200 fill-current"
-                points="2560 0 2560 100 0 100"
-              ></polygon>
-            </svg>
-          </div>
-        </section>
-        <section className="relative py-16 bg-blueGray-200">
-          <div className="container mx-auto px-4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
-              <div className="px-6">
-                <div className="flex flex-wrap justify-center">
-                  <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-                    <div className="relative">
-                      <img
-                        alt="..."
-                        src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg"
-                        className="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-20 lg:-ml-16 max-w-150-px"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
-                    <div className="py-6 px-3 mt-32 sm:mt-0">
-                      <button
-                        className="bg-pink-500 active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                      >
-                        Connect
-                      </button>
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-4/12 px-4 lg:order-1">
-                    <div className="flex justify-center py-4 lg:pt-4 pt-8">
-                      <div className="mr-4 p-3 text-center">
-                        <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">
-                          22
-                        </span>
-                        <span className="text-sm text-blueGray-400">
-                          Friends
-                        </span>
-                      </div>
-                      <div className="mr-4 p-3 text-center">
-                        <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">
-                          10
-                        </span>
-                        <span className="text-sm text-blueGray-400">
-                          Photos
-                        </span>
-                      </div>
-                      <div className="lg:mr-4 p-3 text-center">
-                        <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">
-                          89
-                        </span>
-                        <span className="text-sm text-blueGray-400">
-                          Comments
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-center mt-12">
-                  <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-2">
-                    Jenna Stones
-                  </h3>
-                  <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
-                    <i className="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>
-                    Los Angeles, California
-                  </div>
-                  <div className="mb-2 text-blueGray-600 mt-10">
-                    <i className="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>
-                    Solution Manager - Creative Tim Officer
-                  </div>
-                  <div className="mb-2 text-blueGray-600">
-                    <i className="fas fa-university mr-2 text-lg text-blueGray-400"></i>
-                    University of Computer Science
-                  </div>
-                </div>
-                <div className="mt-10 py-10 border-t border-blueGray-200 text-center">
-                  <div className="flex flex-wrap justify-center">
-                    <div className="w-full lg:w-9/12 px-4">
-                      <p className="mb-4 text-lg leading-relaxed text-blueGray-700">
-                        An artist of considerable range, Jenna the name taken by
-                        Melbourne-raised, Brooklyn-based Nick Murphy writes,
-                        performs and records all of his own music, giving it a
-                        warm, intimate feel with a solid groove structure. An
-                        artist of considerable range.
-                      </p>
-                      <a href="#pablo" className="font-normal text-pink-500">
-                        Show more
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <footer className="relative bg-blueGray-200 pt-8 pb-6 mt-8">
-            <div className="container mx-auto px-4">
-              <div className="flex flex-wrap items-center md:justify-between justify-center">
-                <div className="w-full md:w-6/12 px-4 mx-auto text-center">
-                  <div className="text-sm text-blueGray-500 font-semibold py-1">
-                    Made with{" "}
-                    <a
-                      href="https://www.creative-tim.com/product/notus-js"
-                      className="text-blueGray-500 hover:text-gray-800"
-                      target="_blank"
-                    >
-                      Notus JS
-                    </a>{" "}
-                    by{" "}
-                    <a
-                      href="https://www.creative-tim.com"
-                      className="text-blueGray-500 hover:text-blueGray-800"
-                      target="_blank"
-                    >
-                      {" "}
-                      Creative Tim
-                    </a>
-                    .
-                  </div>
-                </div>
-              </div>
-            </div>
-          </footer>
-        </section>
-      </main>
-    </>
-  );
-}
+import { Separator } from "@radix-ui/react-select";
+import { format } from "date-fns";
+import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Profile() {
   const router = useRouter();
@@ -168,67 +19,72 @@ export function Profile() {
     router.replace("/signin");
     return <></>;
   }
-  return (
-    <div>
-      <div className="flex items-center h-full w-full justify-center">
-        <div className="">
-          <div className="bg-white shadow-xl rounded-lg py-3">
-            <div className="photo-wrapper p-2 flex justify-center">
-              <Avatar className="h-24 w-24">
-                {user?.profilePicture ? (
-                  <AvatarImage src={user.profilePicture} alt={user.firstName} />
-                ) : (
-                  <AvatarFallback>
-                    {`${user.firstName.split("")[0]}${user.lastName.split("")[0]}`}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-            </div>
-            <div className="p-2">
-              <h3 className="text-center text-xl text-gray-900 font-medium leading-8">
-                {user.firstName} {user.lastName}
-              </h3>
-              <div className="text-center text-gray-400 text-xs font-semibold">
-                <p>Active since {new Date(user.createdAt).toDateString()}</p>
-              </div>
-              <table className="text-xs my-3">
-                <tbody>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      Address
-                    </td>
-                    <td className="px-2 py-2">{user.address}</td>
-                  </tr>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      Gender
-                    </td>
-                    <td className="px-2 py-2">{user.gender}</td>
-                  </tr>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      Email
-                    </td>
-                    <td className="px-2 py-2">{user.email}</td>
-                  </tr>
-                </tbody>
-              </table>
 
-              <div className="text-center my-3">
-                <a
-                  className="text-xs text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium"
-                  href="#"
-                >
-                  View Profile
-                </a>
+  return (
+    <div className="p-4 w-[100%] max-w-[800px] mx-auto">
+      <div className="relative mt-16 p-4 pt-16 rounded-xl border shadow-[0px_20px_20px_-10px_rgba(0,0,0,0.1)] min-h-32">
+        <div className="absolute left-0 -top-16 w-full flex align-middle justify-center content-center">
+          <Avatar className="hover:border-2 w-32 h-32 shadow-xl">
+            {user.profilePicture ? (
+              <AvatarImage src={user.profilePicture} alt={user.firstName} />
+            ) : (
+              <AvatarFallback>
+                {`${user.firstName.split("")[0]}${user.lastName.split("")[0]}`}
+              </AvatarFallback>
+            )}
+          </Avatar>
+        </div>
+        <div className="flex flex-col items-center space-y-2 my-4 text-slate-800 px-4 sm:px-10">
+          <p className="text-4xl">
+            {user.firstName} {user.lastName}
+          </p>
+          <p className="text-xl">{user.address}</p>
+          <Separator className="border border-gray-100 w-[calc(100%_-_10%)] sm:!my-12" />
+          <p className="text-xl text-center">{user.bio}</p>
+          <Separator className="border border-gray-100 w-[calc(100%_-_10%)] sm:!my-12" />
+          <ScrollArea className="w-full">
+            <div className="flex flex-row space-x-8 justify-around">
+              {user.dateOfBirth && (
+                <div className="text-center">
+                  <p>Born</p>
+                  <p className="text-violet-800 text-3xl">
+                    {format(user.dateOfBirth, "do")}
+                  </p>
+                  <p className="w-max">{format(user.dateOfBirth, "LLL yy")}</p>
+                </div>
+              )}
+
+              <div className="text-center">
+                <p>have</p>
+                <p className="text-violet-800 text-3xl">45</p>
+                <p>Neighbours</p>
+              </div>
+
+              <div className="text-center">
+                <p>had</p>
+                <p className="text-violet-800 text-3xl">7</p>
+                <p>Incidents</p>
+              </div>
+
+              <div className="text-center">
+                <p>sent</p>
+                <p className="text-violet-800 text-3xl">11</p>
+                <p>Alerts</p>
               </div>
             </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+          <Separator className="border border-gray-100 w-[calc(100%_-_10%)] sm:!my-12" />
+          <div className="flex flex-row justify-between self-stretch items-center">
+            <Button asChild>
+              <Link href="/community/profile/update">update profile</Link>
+            </Button>
+            <Button asChild>
+              <SignoutAction />
+            </Button>
           </div>
         </div>
       </div>
-      <p>
-        <SignoutAction />
-      </p>
     </div>
   );
 }

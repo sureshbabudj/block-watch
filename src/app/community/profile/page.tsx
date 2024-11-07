@@ -1,9 +1,10 @@
 "use client";
-import { Profile, Profile1 } from "@/app/community/profile/Profile";
+
 import withAuthRedirect from "@/hoc/withAuthRedirect";
+import { Profile } from "./Profile";
 
 const ProfilePage = () => {
-  return <Profile1 />;
+  return <Profile />;
 };
 
 export default withAuthRedirect(ProfilePage);

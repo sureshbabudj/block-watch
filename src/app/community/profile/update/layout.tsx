@@ -11,23 +11,15 @@ export const metadata: Metadata = {
 const sidebarNavItems = [
   {
     title: "Profile",
-    href: "/examples/forms",
+    href: "/community/profile/update",
   },
   {
-    title: "Account",
-    href: "/examples/forms/account",
+    title: "Change Password",
+    href: "/community/profile/update/change-password",
   },
   {
-    title: "Appearance",
-    href: "/examples/forms/appearance",
-  },
-  {
-    title: "Notifications",
-    href: "/examples/forms/notifications",
-  },
-  {
-    title: "Display",
-    href: "/examples/forms/display",
+    title: "Neighborhood",
+    href: "/community/profile/update/neighborhood?update=true",
   },
 ];
 
