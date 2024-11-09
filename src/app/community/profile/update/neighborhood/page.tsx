@@ -23,6 +23,9 @@ import NeighborhoodView from "./NeighborhoodView";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Neighborhood } from "@prisma/client";
+import useAuth from "@/hooks/useAuth";
+import { Toast } from "@capacitor/toast";
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -69,6 +72,7 @@ function NeighborhoodSelectionPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const { refreshAuth } = useAuth();
   const { update } = use(searchParams);
   const router = useRouter();
   const [user] = useAtom(userAtom);
@@ -137,6 +141,30 @@ function NeighborhoodSelectionPage({
     return boundaries.map(([lat, lng]) => `${lat}:${lng}`).join(",");
   };
 
+  const addUserToNeighbourhood = async (neighborhood: Neighborhood) => {
+    try {
+      const formData: any = new FormData();
+      formData.append("neighborhoods", neighborhood.id);
+      const response = await fetch(`/api/auth/profile`, {
+        method: "PATCH",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await response.json();
+      await refreshAuth();
+      router.replace("/community/profile");
+    } catch (err: any) {
+      throw new Error(
+        err.message || "An error occurred while adding the user to neighborhood"
+      );
+    }
+  };
+
   const onSubmit = async (data: any) => {
     const inputBoundaries =
       userBoundingBoxPolygon.length > 0
@@ -161,7 +189,8 @@ function NeighborhoodSelectionPage({
       });
 
       if (response.ok) {
-        await response.json();
+        const { neighborhood } = await response.json();
+        await addUserToNeighbourhood(neighborhood);
         router.replace("/community/profile/update");
       } else {
         const errorData = await response.json();

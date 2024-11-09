@@ -109,15 +109,14 @@ export function ProfileForm() {
   const { refreshAuth } = useAuth();
   const [user] = useAtom(userAtom);
   if (!user) {
-    router.replace("/signin");
-    return <></>;
+    return null;
   }
 
   const defaultValues: Partial<ProfileFormValues> = {
     firstName: user.firstName ?? "",
     lastName: user.lastName ?? "",
     email: user.email ?? "",
-    dateOfBirth: user.dateOfBirth || undefined,
+    dateOfBirth: new Date(user.dateOfBirth as any) || undefined,
     gender: user.gender
       ? (user.gender as (typeof genders)[0])
       : "Prefer not to say",
@@ -143,16 +142,12 @@ export function ProfileForm() {
           if (key === "dateOfBirth") {
             refinedFormData.append(key, new Date(value).toISOString());
           } else if (key === "profilePicture") {
-            debugger;
             refinedFormData.append(key, value[0]);
           } else {
             refinedFormData.append(key, value);
           }
         }
       });
-      for (const pair of refinedFormData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-      }
       const response = await fetch(`/api/auth/profile`, {
         method: "PATCH",
         body: refinedFormData,

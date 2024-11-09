@@ -6,6 +6,10 @@ import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import path, { join } from "path";
 
+interface UserUpdatePayload extends User {
+  neighborhoods: string;
+}
+
 export async function GET(req: Request) {
   try {
     const sessionId =
@@ -81,10 +85,11 @@ export async function PATCH(req: NextRequest) {
       firstName = user.firstName,
       profilePicture,
       gender = user.gender,
-    } = Object.fromEntries(formData) as Partial<User>;
+      neighborhoods = "",
+    } = Object.fromEntries(formData) as Partial<UserUpdatePayload>;
 
     let profilePictureFilePath: any = user.profilePicture;
-    if (!profilePicture || profilePicture !== `undefined`) {
+    if (profilePicture && profilePicture !== `undefined`) {
       profilePictureFilePath = await runMiddleware(profilePicture);
     }
 
@@ -102,10 +107,28 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
+    const neighborhoodIds = neighborhoods.split(",");
+
+    if (neighborhoodIds.length > 0) {
+      for (let neighborhoodId of neighborhoodIds) {
+        console.log(neighborhoodId);
+        if (neighborhoodId) {
+          await prisma.neighborhood.update({
+            where: { id: neighborhoodId },
+            data: {
+              users: {
+                connect: { id: user.id },
+              },
+            },
+          });
+        }
+      }
+    }
+
     return NextResponse.json({ updatedUser }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Failed to update user" },
+      { error: error.message || "Failed to update user" },
       { status: 500 }
     );
   }

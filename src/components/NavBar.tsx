@@ -32,7 +32,7 @@ export function NavBar() {
   const pathName = usePathname();
   const user = useAtom(userAtom);
   return (
-    <div className="fixed bottom-0 left-0 bg-white rounded-t-2xl w-full h-16 sm:hidden border-t">
+    <div className="fixed bottom-0 left-0 bg-white rounded-t-2xl w-full h-16 sm:hidden border-t max-sm:z-[999]">
       <ul className="flex justify-around items-center h-full">
         <li
           className={

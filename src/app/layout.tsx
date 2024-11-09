@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <Provider>
-      <html lang="en">
+      <html lang="en" className="min-h-full ">
         <head>
           <meta
             name="viewport"
@@ -27,7 +27,10 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={cn(barlow.className, `antialiased`)}
+          className={cn(
+            barlow.className,
+            `antialiased min-h-[100dvh] flex flex-col`
+          )}
           style={{
             padding:
               "env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)",
@@ -40,3 +43,5 @@ export default function RootLayout({
     </Provider>
   );
 }
+
+export const dynamicParams = true;

@@ -5,8 +5,8 @@ const IntroImg = () => <img src="/file.svg" alt="Connct, Protect, Empower" />;
 
 export default function Page() {
   return (
-    <div className="flex flex-col justify-center h-[100dvh] w-full bg-gradient-to-br from-[#6aa83e] to-[#88ba65] text-white">
-      <div className="relative h-full w-[100%] flex sm:max-w-screen-md mx-auto">
+    <div className="grow flex flex-col items-center bg-gradient-to-br from-[#6aa83e] to-[#88ba65] text-white">
+      <div className="grow relative h-full w-full sm:max-w-screen-md mx-auto flex flex-row">
         <div className="absolute w-full z-1 left-0 bottom-0 justify-center flex">
           <IntroImg />
         </div>

@@ -9,7 +9,7 @@ export default function Layout({
   return (
     <>
       <Header />
-      <div className="max-sm:overflow-hidden">
+      <div className="max-sm:overflow-hidden max-sm:my-16 py-4">
         <main className="max-sm:overflow-y-auto">{children}</main>
       </div>
       <NavBar />

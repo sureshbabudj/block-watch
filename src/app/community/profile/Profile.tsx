@@ -26,7 +26,7 @@ export function Profile() {
               <AvatarImage src={user.profilePicture} alt={user.firstName} />
             ) : (
               <AvatarFallback>
-                {`${user.firstName.split("")[0]}${user.lastName.split("")[0]}`}
+                <p className="text-6xl">{`${user.firstName.split("")[0]}${user.lastName.split("")[0]}`}</p>
               </AvatarFallback>
             )}
           </Avatar>
@@ -36,8 +36,12 @@ export function Profile() {
             {user.firstName} {user.lastName}
           </p>
           <p className="text-xl">{user.address}</p>
-          <Separator className=" my-8 sm:!my-12" />
-          <p className="text-xl text-center">{user.bio}</p>
+          {user.bio && (
+            <>
+              <Separator className=" my-8 sm:!my-12" />
+              <p className="text-xl text-center">{user.bio}</p>
+            </>
+          )}
           <Separator className=" my- sm:!my-12" />
           <ScrollArea className="w-full">
             <div className="flex flex-row space-x-8 justify-around py-4">
@@ -74,9 +78,9 @@ export function Profile() {
           <Separator className=" sm:!my-12" />
           <div className="flex flex-row justify-between self-stretch items-center">
             <Button asChild>
-              <Link href="/community/profile/update">update profile</Link>
+              <Link href="/community/profile/update">Update profile</Link>
             </Button>
-            <Button asChild>
+            <Button variant="destructive">
               <SignoutAction />
             </Button>
           </div>

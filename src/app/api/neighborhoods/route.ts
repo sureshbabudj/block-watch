@@ -15,11 +15,11 @@ export async function POST(request: Request) {
     if (!name || !boundaries || !description || !rules) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    const data = await prisma.neighborhood.create({
+    const neighborhood = await prisma.neighborhood.create({
       data: {
         name,
         boundaries,
@@ -28,11 +28,11 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json({ neighborhood }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message ?? "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -45,7 +45,7 @@ export async function GET() {
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message ?? "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -59,7 +59,7 @@ export async function PUT(request: Request) {
     if (!id || !name || !boundaries || !description || !rules) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -77,7 +77,7 @@ export async function PUT(request: Request) {
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message ?? "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -91,7 +91,7 @@ export async function DELETE(request: Request) {
     if (!id) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -101,12 +101,12 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json(
       { message: "Neighborhood deleted successfully" },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message ?? "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

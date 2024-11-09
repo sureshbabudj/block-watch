@@ -53,7 +53,7 @@ export function Header() {
   };
 
   return (
-    <header className="flex bg-white border-b px-4 py-1 mb-[5px] tracking-wide max-sm:fixed max-sm:top-0 max-sm:left-0 max-sm:w-full max-sm:z-10">
+    <header className="flex bg-white border-b px-4 py-1 mb-[5px] tracking-wide max-sm:fixed max-sm:top-0 max-sm:left-0 max-sm:w-full max-sm:z-[999]">
       <div className="flex flex-wrap items-center lg:gap-y-2 gap-4 w-full">
         {/* <!-- logo --> */}
         <div className="inline-flex">

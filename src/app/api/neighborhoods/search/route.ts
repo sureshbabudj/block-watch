@@ -63,12 +63,6 @@ export async function GET(request: Request) {
         where: {
           id: neighborhood.id,
         },
-        include: {
-          users: true,
-          posts: true,
-          events: true,
-          Alert: true,
-        },
       });
       return NextResponse.json({ neighborhood: result }, { status: 200 });
     } else {

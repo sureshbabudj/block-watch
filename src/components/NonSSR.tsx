@@ -25,7 +25,6 @@ const LoadNonSSR = ({ showInfo = false }: { showInfo?: boolean }) => {
 
   return (
     <>
-      {/* <AuthMiddleware /> */}
       {showInfo && (
         <div>
           {deviceInfo && (
